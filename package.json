@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "prettier-eslint": "^12.0.0"
+  },
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "jsdom": "^16.5.0",
+    "node-fetch": "^2.6.1"
+  }
+}
