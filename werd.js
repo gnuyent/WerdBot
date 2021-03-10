@@ -15,7 +15,7 @@ function roll(defaultLog, message, args) {
         return;
     } else {
         const dice = args[0].split("d");
-        // Check if we have 'd'
+        // Check if we have 'd'/proper num arguments
         if (dice.length != 2) {
             console.log(`${defaultLog} failed a roll (invalid argument(s): ${args}).`);
             return;
@@ -25,10 +25,11 @@ function roll(defaultLog, message, args) {
         let half_two = dice[1].split('+');
         const dice_sides = half_two[0]; // s
         let additive = Number(half_two[1]);
+        // check if additive exists
         if (!isNaN(additive)) {
             add_str = ` + ${additive}`;
         } else {
-            // no additive
+            // no additive to roll
             add_str = "";
             additive = 0;
         }
@@ -45,9 +46,10 @@ function roll(defaultLog, message, args) {
         let total = 0;
         total += additive;
         for (i = 0; i < dice_count; i++) {
+            // 1 to max inclusive
             const roll = Math.floor(Math.random() * dice_sides) + 1;
             total += roll;
-            // add number
+            // bold if max or 1
             if (roll == dice_sides || roll == 1) {
                 roll_str += `**${roll}**`;
             }
@@ -95,6 +97,7 @@ function scrape_word(defaultLog, message, dictionary) {
     let definition_selector = "";
     let date_selector = "";
 
+    // CSS Selectors
     if (dictionary === "m") {
         dictionary = "Merriam-Webster";
         url = "https://www.merriam-webster.com/word-of-the-day";
@@ -131,12 +134,25 @@ function scrape_word(defaultLog, message, dictionary) {
 
             if (dictionary === "Merriam-Webster") {
                 definition_str = "";
+                // don't number if only one definition
+                if (definition.length == 1) {
+                    // check if archaic
+                    if (definition[0].includes("archaic")) {
+                        definition_str += `*archaic* : ${definition[0].split(":")[1].split()}`;
+                    } else {
+                        definition_str += `${definition[0].split(":")[1].split()}`;
+                    }
+                }
+
+                // number if > 1 definition
                 for (i = 0; i < definition.length; i++) {
+                    // check if archaic
                     if (definition[i].includes("archaic")) {
                         definition_str += `${i + 1}.  *archaic* : ${definition[i].split(":")[1].split()}`;
                     } else {
                         definition_str += `${i + 1}. ${definition[i].split(":")[1].split()}`;
                     }
+                    // add newline unless last definition
                     if (i != definition.length - 1) {
                         definition_str += "\n";
                     }
@@ -146,6 +162,7 @@ function scrape_word(defaultLog, message, dictionary) {
                 date = date[0].split(":")[1].trim();
             } else if (dictionary === "Dictionary.com") {
                 pronouncication = pronouncication[0].trim();
+                // remove brackets
                 pronouncication = pronouncication.substring(2, pronouncication.length - 2);
 
                 date = date[0].split(" ");
