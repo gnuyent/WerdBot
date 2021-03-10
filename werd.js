@@ -4,7 +4,7 @@ const { prefix, token } = require("./config.json");
 
 // Login message
 client.on("ready", () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+    console.log(`Logged in as ${client.user.tag}!\n`);
 });
 
 // Rolls a dice.
@@ -164,7 +164,8 @@ client.on("message", (message) => {
 
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
-    const defaultLog = `${message.author.username} ${message.author}`;
+    const currentTime = new Date();
+    const defaultLog = `[${currentTime.toLocaleString()}] ${message.author.username} ${message.author}`;
 
     if (command === "ping") {
         console.log(`${defaultLog} pinged.`);
