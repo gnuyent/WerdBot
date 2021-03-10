@@ -183,6 +183,8 @@ client.on("message", (message) => {
         // hidden purge
         message.channel.bulkDelete(100)
             .then(console.log(`${defaultLog} cleared the chat.`));
+    } else {
+        messege.delete();
     }
 });
 
