@@ -184,7 +184,8 @@ client.on("message", (message) => {
         message.channel.bulkDelete(100)
             .then(console.log(`${defaultLog} cleared the chat.`));
     } else {
-        message.delete();
+        message.delete()
+            .then(console.log(`${defaultLog} deleted unknown command ${message.content}.`));
     }
 });
 
