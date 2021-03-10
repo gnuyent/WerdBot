@@ -14,7 +14,7 @@ First install node and npm. Then, clone and enter the repository.
 Once inside, run the following commands:
 
 ```
-npm install
+npm install --only=prod
 
 node werd.js
 ```
