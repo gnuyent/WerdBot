@@ -181,7 +181,8 @@ client.on("message", (message) => {
         return roll(defaultLog, message, args);
     } else if (command === "asdf") {
         // hidden purge
-        message.channel.bulkDelete(100);
+        message.channel.bulkDelete(100)
+            .then(console.log(`${defaultLog} cleared the chat.`));
     }
 });
 
