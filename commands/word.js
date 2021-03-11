@@ -23,6 +23,23 @@ function scrape_word(defaultLog, message, mwkey, oword) {
         .then(resp => resp.text())
         .then(text => {
             const json = JSON.parse(text);
+
+            // check spelling
+            if ((typeof json[0] === "string") && json.length >= 1) {
+                // roasts
+                const responses = [
+                    `It's acccctually :point_up: :nerd:  spelled '${json[0]}', not '${oword}'.`,
+                    `:eye: :lips: :eye:\nmfw when you can't spell '${json[0]}'`,
+                    `:clown:  There were ${json.length} correct words and you had none of them.`
+                ];
+
+                message.delete();
+                message.channel.send(`${message.author}\n` + responses[Math.floor(Math.random() * responses.length)]);
+                // uncomment this to send the actual one
+                //return scrape_word(defaultLog, message, mwkey, json[0]);
+                return;
+            }
+
             try {
                 const strSim = require('string-similarity');
                 let stringBuilder = `${message.author}\n**Merriam-Webster** - <${clean_url}>\n`;
