@@ -5,19 +5,22 @@
   "dependencies": {
     "discord.js": "^12.5.1",
     "jsdom": "^16.5.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "string-similarity": "^4.0.4"
   },
   "eslintConfig": {
     "env": {
       "es6": true,
       "node": true
     },
-    "plugins": ["prettier"],
+    "plugins": [
+      "prettier"
+    ],
     "rules": {
       "prettier/prettier": "error"
     },
     "extends": [
       "prettier"
     ]
-    }
+  }
 }

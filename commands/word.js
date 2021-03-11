@@ -24,11 +24,14 @@ function scrape_word(defaultLog, message, mwkey, oword) {
         .then(text => {
             const json = JSON.parse(text);
             try {
+                const strSim = require('string-similarity');
                 let stringBuilder = `${message.author}\n**Merriam-Webster** - <${clean_url}>\n`;
 
                 json.forEach(definition => {
                     const word = definition["meta"]["id"].split(":")[0];
-                    if (word.toLowerCase() !== oword) {
+                    // adjust score as needed
+                    const SCORE = 0.75;
+                    if (strSim.compareTwoStrings(word, oword) < SCORE) {
                         return; // skip if definition contains a part of the word
                     }
                     stringBuilder += `**${word}** `;
