@@ -30,10 +30,10 @@ client.on("message", (message) => {
         return word.word(defaultLog, message, mwkey, command, args);
     } else if (command === "roll" || command === "r") {
         return roll.roll(defaultLog, message, args);
-    } else if (command === "asdf") {
+    } else if (command === "delete") {
         // hidden purge
         message.channel.bulkDelete(2)
-            .then(console.log(`${defaultLog} cleared the chat.`));
+            .then(console.log(`${defaultLog} deleted the last message.`));
     } else {
         message.delete()
             .then(console.log(`${defaultLog} deleted unknown command ${message.content}.`));

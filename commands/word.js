@@ -13,26 +13,58 @@ function word(defaultLog, message, mwkey, dictionary, args) {
 function clean(url) {
     return url.replace(" ", "%20").replace("'", "%27");
 }
-function scrape_word(defaultLog, message, mwkey, word) {
+
+function scrape_word(defaultLog, message, mwkey, oword) {
     const fetch = require('node-fetch')
-    const JSDOM = require('jsdom').JSDOM
-    let url = clean(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${mwkey}`);
-    let clean_url = clean(`https://www.merriam-webster.com/dictionary/${word}`);
+    let url = clean(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${oword}?key=${mwkey}`);
+    let clean_url = clean(`https://www.merriam-webster.com/dictionary/${oword}`);
 
     fetch(url)
         .then(resp => resp.text())
         .then(text => {
             const json = JSON.parse(text);
-            const word = json[0]["meta"]["id"];
-            const pronunciation = json[0]["hwi"]["prs"][0]["mw"];
-            const wordType = json[0]["fl"];
-            const definition = json[0]["shortdef"][0];
-            message.delete()
-                .then(message.channel.send(`**Merriam-Webster**\n**${word}** (${wordType}) | ${pronunciation}\n${definition}\n<${clean_url}>`))
-                .then(console.log(`${defaultLog} fetched the word (${word}) on Merriam-Webster.`));
+            try {
+                let stringBuilder = `${message.author}\n**Merriam-Webster** - <${clean_url}>\n`;
+
+                json.forEach(definition => {
+                    const word = definition["meta"]["id"].split(":")[0];
+                    if (word.toLowerCase() !== oword) {
+                        return; // skip if definition contains a part of the word
+                    }
+                    stringBuilder += `**${word}** `;
+
+                    const wordType = definition["fl"];
+                    stringBuilder += `(${wordType})`;
+
+                    try {
+                        const pronunciation = definition["hwi"]["prs"][0]["mw"];
+                        stringBuilder += ` | ${pronunciation}`;
+                    } catch { }
+
+                    const defArr = definition["shortdef"];
+                    if (defArr.length == 1) {
+                        stringBuilder += `\n${defArr[0]}\n\n`;
+                    } else {
+                        stringBuilder += "\n";
+                        for (i = 0; i < defArr.length; i++) {
+                            stringBuilder += `${i + 1}. ${defArr[i]}\n`;
+                        }
+                        stringBuilder += "\n";
+                    }
+                });
+
+                message.delete()
+                    .then(message.channel.send(stringBuilder))
+                    .then(console.log(`${defaultLog} searched '${oword}' on Merriam-Webster.`));
+            } catch (err) {
+                message.delete()
+                    .then(message.reply(`**${oword}** is not a valid word!`))
+                    .then(console.log(`${defaultLog} tried to search the word '${oword}' on Merriam-Webster.`));
+            }
         });
 }
 
+// wotd = word of the day
 function scrape_wotd(defaultLog, message, dictionary) {
     const fetch = require('node-fetch')
     const JSDOM = require('jsdom').JSDOM
@@ -116,7 +148,7 @@ function scrape_wotd(defaultLog, message, dictionary) {
             }
 
             message.delete()
-                .then(message.channel.send(`**Word of the Day (${dictionary}) : ${date}**\n**${word}** (${word_type}) | ${pronouncication}\n${definition}\n<${url}>`))
+                .then(message.channel.send(`${message.author}\n**Word of the Day (${dictionary}) : ${date}**\n**${word}** (${word_type}) | ${pronouncication}\n${definition}\n<${url}>`))
                 .then(console.log(`${defaultLog} fetched the word of the day (${word}) on ${dictionary}.`));
         });
 }
