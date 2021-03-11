@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const client = new Discord.Client();
-const { prefix, token } = require("./config.json");
+const { prefix, token, mwkey } = require("./config.json");
 
 
 // Login message
@@ -26,10 +26,8 @@ client.on("message", (message) => {
     } else if (command === "pong") {
         console.log(`${defaultLog} ponged.`);
         return message.reply("ping.");
-    } else if (command === "m") {
-        return word.wotd(defaultLog, message, "m");
-    } else if (command === "d") {
-        return word.wotd(defaultLog, message, "d");
+    } else if (command === "m" || command === "d") {
+        return word.word(defaultLog, message, mwkey, command, args);
     } else if (command === "roll" || command === "r") {
         return roll.roll(defaultLog, message, args);
     } else if (command === "asdf") {

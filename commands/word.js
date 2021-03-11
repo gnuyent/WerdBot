@@ -1,19 +1,39 @@
 // Gets the word of the day.
-function wotd(defaultLog, message, args) {
-    if (!args.length) {
-        console.log(`${defaultLog} didn't specify a dictionary.`);
-        return message.channel.send(
-            `You didn't provide any arguments, ${message.author}!`
-        );
-    } else if (args[0] === "m" || args[0] === "d") {
-        scrape_word(defaultLog, message, args[0]);
-    }
-    else {
-        return message.channel.send(`You submitted an invalid dictionary, ${message.author}!`);
+function word(defaultLog, message, mwkey, dictionary, args) {
+    if (args.length >= 1 && dictionary === "m") {
+        scrape_word(defaultLog, message, mwkey, args.join(" "));
+    } else if (args.length === 0 && (dictionary === "m" || dictionary === "d")) {
+        scrape_wotd(defaultLog, message, dictionary);
+    } else {
+        message.reply(`wrong dictionary!`)
+            .then(console.log(`${defaultLog} used the wrong dictionary.`));
     }
 }
 
-function scrape_word(defaultLog, message, dictionary) {
+function clean(url) {
+    return url.replace(" ", "%20").replace("'", "%27");
+}
+function scrape_word(defaultLog, message, mwkey, word) {
+    const fetch = require('node-fetch')
+    const JSDOM = require('jsdom').JSDOM
+    let url = clean(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${word}?key=${mwkey}`);
+    let clean_url = clean(`https://www.merriam-webster.com/dictionary/${word}`);
+
+    fetch(url)
+        .then(resp => resp.text())
+        .then(text => {
+            const json = JSON.parse(text);
+            const word = json[0]["meta"]["id"];
+            const pronunciation = json[0]["hwi"]["prs"][0]["mw"];
+            const wordType = json[0]["fl"];
+            const definition = json[0]["shortdef"][0];
+            message.delete()
+                .then(message.channel.send(`**Merriam-Webster**\n**${word}** (${wordType}) | ${pronunciation}\n${definition}\n<${clean_url}>`))
+                .then(console.log(`${defaultLog} fetched the word (${word}) on Merriam-Webster.`));
+        });
+}
+
+function scrape_wotd(defaultLog, message, dictionary) {
     const fetch = require('node-fetch')
     const JSDOM = require('jsdom').JSDOM
     let url = "";
@@ -101,4 +121,4 @@ function scrape_word(defaultLog, message, dictionary) {
         });
 }
 
-module.exports = {wotd};
+module.exports = { word };
